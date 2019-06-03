@@ -14,7 +14,7 @@ const Modal = React.memo((props) => {
 		</>
 	);
 }, (prevProps, newProps) => {
-	return prevProps.show === newProps.show;
+	return prevProps.show === newProps.show && newProps.children === prevProps.children;
 });
 
 export default Modal;
