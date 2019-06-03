@@ -11,7 +11,7 @@ const Burger = (props) => {
 	 * and then creates a new array with that value [3]. Since we're using Array() the array is 3
 	 * slots long, and since we're using the spread operator, all the slots will be occupied by
 	 * the same value [3, 3, 3].
-	 * We then map over this array, we ignore the first value (the actual value, 3 in this case)
+	 * We then map over this array, we ignore the first parameter (the actual value, 3 in this case)
 	 * and only use the index. This is to add the unique key to the element as required by React.
 	 * In the end we return a <BurgerIngredient/> component with its unique key and type "key"
 	 * which is cheese in this case. Since we're mapping for that same ammount of keys [3, 3, 3],

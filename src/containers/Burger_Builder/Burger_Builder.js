@@ -1,8 +1,11 @@
 import React from 'react';
+import ErrorHandler from '../../components/HOC/Error_Handler/Error_Handler';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/Build_Controls/Build_Controls';
 import Modal from '../../components/Ui/Modal/Modal';
+import Spinner from '../../components/Ui/Spinner/Spinner';
 import OrderSummary from '../../components/Burger/Order_Summary/Order_Summary';
+import axios from '../../utils/axios_orders';
 
 const INGREDIENT_PRICES = {
 	salad: 0.5,
@@ -15,16 +18,22 @@ class BurgerBuilder extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			ingredients: {
-				salad: 0,
-				bacon: 0,
-				cheese: 0,
-				meat: 0
-			},
+			ingredients: null,
 			totalPrice: 5,
 			purchasable: false,
-			purchasing: false
+			purchasing: false,
+			loading: false
 		};
+	}
+
+	componentDidMount() {
+		axios.get('https://react-burger-udemy-nhd.firebaseio.com/ingredients.json')
+		.then(response => {
+			this.setState({ ingredients: response.data});
+		})
+		.catch(error => {
+			console.log(error);
+		})
 	}
 
 	purchaseHandler = () => {
@@ -101,10 +110,41 @@ class BurgerBuilder extends React.Component {
 		}
 	}
 
-
-
 	purchaseContinueHandler = () => {
-		alert('You continued!');
+		// The query params here are hardcoded (as long as we don't add more ingredients, this will work).
+		// Check lecture 252 (Passing Ingredients via Query Params). There's a more proper way to pass query
+		// params using a scalable method based on encodeURIComponent.
+		this.props.history.push({
+			pathname: '/checkout',
+			search: `?bacon=${this.state.ingredients.bacon}&cheese=${this.state.ingredients.cheese}&meat=${this.state.ingredients.meat}&salad=${this.state.ingredients.salad}`
+		});
+
+		/*this.setState({ loading: true });
+
+		const order = {
+			ingredients: this.state.ingredients,
+			// On production this should be calculated on the server-side to avoid tampering.
+			price: this.state.totalPrice,
+			customer: {
+				name: 'Max',
+				address: {
+					street: 'Johnson 23233',
+					zipCode: '67899',
+					country: 'USA'
+				},
+				email: 'test@test.com'
+			},
+			deliveryMethod: 'fastest'
+		};
+
+		axios.post('/orders.json', order) // Done like this as especified by Firebase. Check Lecture #208.
+		.then(response => {
+			this.setState({ loading: false, purchasing: false });
+		})
+		.catch(error => {
+			console.log(error);
+			this.setState({ loading: false, purchasing: false });
+		});*/
 	}
 
 	render() {
@@ -117,30 +157,49 @@ class BurgerBuilder extends React.Component {
 			disabledInfo[key] = disabledInfo[key] <= 0
 		}
 
+		let orderSummary = null;
+		let burger = <Spinner/>;
+		
+		if(this.state.ingredients) {
+			orderSummary = (
+				<OrderSummary 
+				ingredients={this.state.ingredients}
+				price={this.state.totalPrice}
+				purchaseCanceled={this.purchaseCancelHandler}
+				purchaseContinued={this.purchaseContinueHandler}
+				/>
+			);
+
+			burger = (
+				<>
+					<Burger ingredients={this.state.ingredients}/>
+					<div>
+						<BuildControls 
+						totalPrice={this.state.totalPrice}
+						ingredientAdded={this.addIngredientHandler}
+						ingredientRemoved={this.removeIngredientHandler}
+						disabled={disabledInfo}
+						purchasable={this.state.purchasable}
+						ordered={this.purchaseHandler}
+						/>
+					</div>
+				</>
+			);
+		}
+
+		if(this.state.loading) {
+			orderSummary = <Spinner/>
+		}
+
 		return(
 			<>
 				<Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
-					<OrderSummary 
-					ingredients={this.state.ingredients}
-					price={this.state.totalPrice}
-					purchaseCanceled={this.purchaseCancelHandler}
-					purchaseContinued={this.purchaseContinueHandler}
-					/>
+					{orderSummary}
 				</Modal>
-				<Burger ingredients={this.state.ingredients}/>
-				<div>
-					<BuildControls 
-					totalPrice={this.state.totalPrice}
-					ingredientAdded={this.addIngredientHandler}
-					ingredientRemoved={this.removeIngredientHandler}
-					disabled={disabledInfo}
-					purchasable={this.state.purchasable}
-					ordered={this.purchaseHandler}
-					/>
-				</div>
+				{burger}
 			</>
 		);
 	}
 }
 
-export default BurgerBuilder;
+export default ErrorHandler(BurgerBuilder, axios);
