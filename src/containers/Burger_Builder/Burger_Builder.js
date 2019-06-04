@@ -116,35 +116,8 @@ class BurgerBuilder extends React.Component {
 		// params using a scalable method based on encodeURIComponent.
 		this.props.history.push({
 			pathname: '/checkout',
-			search: `?bacon=${this.state.ingredients.bacon}&cheese=${this.state.ingredients.cheese}&meat=${this.state.ingredients.meat}&salad=${this.state.ingredients.salad}`
+			search: `?price=${this.state.totalPrice}&bacon=${this.state.ingredients.bacon}&cheese=${this.state.ingredients.cheese}&meat=${this.state.ingredients.meat}&salad=${this.state.ingredients.salad}`
 		});
-
-		/*this.setState({ loading: true });
-
-		const order = {
-			ingredients: this.state.ingredients,
-			// On production this should be calculated on the server-side to avoid tampering.
-			price: this.state.totalPrice,
-			customer: {
-				name: 'Max',
-				address: {
-					street: 'Johnson 23233',
-					zipCode: '67899',
-					country: 'USA'
-				},
-				email: 'test@test.com'
-			},
-			deliveryMethod: 'fastest'
-		};
-
-		axios.post('/orders.json', order) // Done like this as especified by Firebase. Check Lecture #208.
-		.then(response => {
-			this.setState({ loading: false, purchasing: false });
-		})
-		.catch(error => {
-			console.log(error);
-			this.setState({ loading: false, purchasing: false });
-		});*/
 	}
 
 	render() {
