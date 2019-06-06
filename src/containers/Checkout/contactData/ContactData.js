@@ -3,17 +3,75 @@ import Button from '../../../components/Ui/Button/Button';
 import Classes from './ContactData.css';
 import axios from '../../../utils/axios_orders';
 import Spinner from '../../../components/Ui/Spinner/Spinner';
+import Input from '../../../components/Ui/Input/Input';
 import { withRouter } from 'react-router-dom';
 
 class ContactData extends Component {
+	helper = (element, type, placeholder, extraRules) => {
+		return(
+			{
+				elementType: element,
+				elementConfig: {
+					type: type,
+					placeholder: placeholder
+				},
+				value: '',
+				validation: {
+					required: true,
+					...extraRules
+				},
+				valid: false,
+				touched: false
+			}
+		);
+	}
+
 	state = {
-		name: '',
-		email: '',
-		address: {
-			street: '',
-			zipCode: ''
+		orderForm: {
+			name: this.helper('input', 'text', 'Your name.'),
+			street: this.helper('input', 'text', 'Your street address.'),
+			zipCode: this.helper('input', 'text', 'Your ZIP code.', { minLength: 4, maxLength: 6}),
+			country: this.helper('input', 'text', 'Your country.'),
+			email: this.helper('input', 'email', 'Your email.'),
+			deliveryMethod: {
+				elementType: 'select',
+				elementConfig: {
+					options: [
+						{value: 'fastest', displayValue: 'Fastest'},
+						{value: 'cheapest', displayValue: 'Cheapest'}
+					]
+				},
+				value: 'fastest',
+				validation: {},
+				valid: true
+			}
 		},
-		loading: false
+		loading: false,
+		validForm: false
+	}
+
+	checkValidation = (value, rules) => {
+		// Each rule is checked against && isValid to avoid having the last rule change the isValid value to true
+		// if another rule check changes it to false.
+
+		let isValid = true;
+
+		if(!rules) return true;
+
+		if(rules.required) {
+			// False if the trimmed value equals to an empty string.
+			isValid = value.trim() !== '' && isValid;
+		}
+
+		if(rules.minLength) {
+			isValid = value.length >= rules.minLength && isValid;
+		}
+
+		if(rules.maxLength) {
+			isValid = value.length <= rules.maxLength && isValid;
+		}
+
+		return isValid;
 	}
 
 	orderHandler = (event) => {
@@ -21,23 +79,19 @@ class ContactData extends Component {
 
 		this.setState({ loading: true });
 
+		// Thanks to two-way binding, all our form data is already in the state. We simply have to map
+		// keys to values.
+		const formData = {};
+		for(let formElement in this.state.orderForm) {
+			formData[formElement] = this.state.orderForm[formElement].value;
+		}
+
 		const order = {
 			ingredients: this.props.ingredients,
 			// On production this should be calculated on the server-side to avoid tampering.
 			price: this.props.price,
-			customer: {
-				name: 'Max',
-				address: {
-					street: 'Johnson 23233',
-					zipCode: '67899',
-					country: 'USA'
-				},
-				email: 'test@test.com'
-			},
-			deliveryMethod: 'fastest'
+			orderData: formData
 		};
-
-		console.log(order);
 
 		axios.post('/orders.json', order) // Done like this as especified by Firebase. Check Lecture #208.
 		.then(response => {
@@ -51,14 +105,59 @@ class ContactData extends Component {
 		});
 	}
 
+	inputChangedHandler = (event, inputID) => {
+		/* updatedInput copies orderForm which has nested elements. This is not a deep copy and violates React
+		state immutability. */
+		const updatedOrderForm = { ...this.state.orderForm }
+
+		/* By doing this we copy an specific object from our state. It still has nested elements and therefore
+		violates state immutability. However, since we only care about the "value" property which isn't nested,
+		there's no mutation of the state as long as we don't touch the "elementConfig" property. */
+		const updatedFormElement = { ...updatedOrderForm[inputID] }
+
+		updatedFormElement.value = event.target.value;
+		updatedFormElement.valid = this.checkValidation(updatedFormElement.value, updatedFormElement.validation);
+		updatedFormElement.touched = true;
+		updatedOrderForm[inputID] = updatedFormElement;
+
+		let formIsValid = true;
+		for(let key in updatedOrderForm) {
+			formIsValid = updatedOrderForm[key].valid && formIsValid;
+		}
+
+		this.setState({ orderForm: updatedOrderForm, validForm: formIsValid });
+	}
+
 	render() {
+		const formElements = [];
+
+		for(let key in this.state.orderForm) {
+			formElements.push({
+				id: key,
+				config: this.state.orderForm[key]
+			})
+		}
+
 		let form = (
-			<form>
-				<input type='text' name='name' placeholder='Your name'/>
-				<input type='email' name='email' placeholder='Your email'/>
-				<input type='text' name='street' placeholder='Your street'/>
-				<input type='text' name='zipCode' placeholder='Your ZIP Code'/>
-				<Button type='Success' clicked={this.orderHandler}>Order</Button>
+			<form onSubmit={this.orderHandler}>
+				{formElements.map(e => (
+					<Input
+					key = {e.id}
+					elementType = {e.config.elementType}
+					value = {e.config.value}
+					config = {e.config.elementConfig}
+					changed = {(event) => this.inputChangedHandler(event, e.id)}
+					invalid = {!e.config.valid}
+					shouldValidate = {e.config.validation}
+					touched = {e.config.touched}
+					/>
+				))}
+				<Button
+				type='Success'
+				clicked={this.orderHandler}
+				disabled={!this.state.validForm}>
+					Order
+				</Button>
 			</form>
 		)
 		if(this.state.loading) form = <Spinner/>
