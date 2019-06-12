@@ -6,6 +6,8 @@ import Spinner from '../../../components/Ui/Spinner/Spinner';
 import Input from '../../../components/Ui/Input/Input';
 import { withRouter } from 'react-router-dom';
 
+import { connect } from 'react-redux';
+
 class ContactData extends Component {
 	helper = (element, type, placeholder, extraRules) => {
 		return(
@@ -89,7 +91,7 @@ class ContactData extends Component {
 		const order = {
 			ingredients: this.props.ingredients,
 			// On production this should be calculated on the server-side to avoid tampering.
-			price: this.props.price,
+			price: this.props.totalPrice,
 			orderData: formData
 		};
 
@@ -171,4 +173,11 @@ class ContactData extends Component {
 	}
 }
 
-export default withRouter(ContactData);
+const mapStateToProps = (state) => {
+	return {
+		ingredients: state.ingredients,
+		totalPrice: state.totalPrice
+	}
+}
+
+export default connect(mapStateToProps)(withRouter(ContactData));

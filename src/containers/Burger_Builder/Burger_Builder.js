@@ -7,26 +7,19 @@ import Spinner from '../../components/Ui/Spinner/Spinner';
 import OrderSummary from '../../components/Burger/Order_Summary/Order_Summary';
 import axios from '../../utils/axios_orders';
 
-const INGREDIENT_PRICES = {
-	salad: 0.5,
-	bacon: 0.7,
-	cheese: 0.4,
-	meat: 1.5
-};
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions';
 
 class BurgerBuilder extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			ingredients: null, // move to Redux
-			totalPrice: 5, // move to Redux
-			purchasable: false,
 			purchasing: false,
 			loading: false
 		};
 	}
 
-	componentDidMount() {
+	/*componentDidMount() {
 		axios.get('https://react-burger-udemy-nhd.firebaseio.com/ingredients.json')
 		.then(response => {
 			this.setState({ ingredients: response.data});
@@ -34,7 +27,7 @@ class BurgerBuilder extends React.Component {
 		.catch(error => {
 			console.log(error);
 		})
-	}
+	}*/
 
 	purchaseHandler = () => {
 		this.setState({
@@ -48,81 +41,28 @@ class BurgerBuilder extends React.Component {
 		});
 	}
 
-	updatePurchaseState = (allIngredients) => {
+	updatePurchaseState = () => {
 		// We use a parameter instead of reading the state directly. Remember that the state is not
 		// updated live.
 
-		const sum = Object.keys(allIngredients)
+		const sum = Object.keys(this.props.ingredients)
 		.map(elm => {
-			return allIngredients[elm];
+			return this.props.ingredients[elm];
 		})
 		.reduce((sum, elm) => {
 			return sum + elm;
 		}, 0);
 
-		this.setState({
-			purchasable: sum > 0
-		});
-	}
-
-	addIngredientHandler = (type) => {
-		const oldCount = this.state.ingredients[type];
-		const updatedCount = oldCount + 1;
-
-		// Done this way so the state is not mutated directly as required by the React standard.
-		const updatedIngredients = {
-			...this.state.ingredients
-		};
-
-		updatedIngredients[type] = updatedCount;
-
-		const priceAddition = INGREDIENT_PRICES[type];
-		const newPrice = this.state.totalPrice + priceAddition;
-
-		this.setState({
-			ingredients: updatedIngredients,
-			totalPrice: newPrice
-		});
-
-		this.updatePurchaseState(updatedIngredients);
-	}
-
-	removeIngredientHandler = (type) => {
-		const oldCount = this.state.ingredients[type];
-		if(oldCount > 0) {
-			const updatedCount = oldCount - 1;
-	
-			const updatedIngredients = {
-				...this.state.ingredients
-			};
-	
-			updatedIngredients[type] = updatedCount;
-	
-			const priceDeduction = INGREDIENT_PRICES[type];
-			const newPrice = this.state.totalPrice - priceDeduction;
-	
-			this.setState({
-				ingredients: updatedIngredients,
-				totalPrice: newPrice
-			});
-
-			this.updatePurchaseState(updatedIngredients);
-		}
+		return sum > 0;
 	}
 
 	purchaseContinueHandler = () => {
-		// The query params here are hardcoded (as long as we don't add more ingredients, this will work).
-		// Check lecture 252 (Passing Ingredients via Query Params). There's a more proper way to pass query
-		// params using a scalable method based on encodeURIComponent.
-		this.props.history.push({
-			pathname: '/checkout',
-			search: `?price=${this.state.totalPrice}&bacon=${this.state.ingredients.bacon}&cheese=${this.state.ingredients.cheese}&meat=${this.state.ingredients.meat}&salad=${this.state.ingredients.salad}`
-		});
+		this.props.history.push('/checkout');
 	}
 
 	render() {
 		const disabledInfo = {
-			...this.state.ingredients
+			...this.props.ingredients
 		};
 
 		for(let key in disabledInfo) {
@@ -133,11 +73,11 @@ class BurgerBuilder extends React.Component {
 		let orderSummary = null;
 		let burger = <Spinner/>;
 		
-		if(this.state.ingredients) {
+		if(this.props.ingredients) {
 			orderSummary = (
-				<OrderSummary 
-				ingredients={this.state.ingredients}
-				price={this.state.totalPrice}
+				<OrderSummary
+				ingredients={this.props.ingredients}
+				price={this.props.totalPrice}
 				purchaseCanceled={this.purchaseCancelHandler}
 				purchaseContinued={this.purchaseContinueHandler}
 				/>
@@ -145,14 +85,14 @@ class BurgerBuilder extends React.Component {
 
 			burger = (
 				<>
-					<Burger ingredients={this.state.ingredients}/>
+					<Burger ingredients={this.props.ingredients}/>
 					<div>
 						<BuildControls 
-						totalPrice={this.state.totalPrice}
-						ingredientAdded={this.addIngredientHandler}
-						ingredientRemoved={this.removeIngredientHandler}
+						totalPrice={this.props.totalPrice}
+						ingredientAdded={this.props.addIngredient}
+						ingredientRemoved={this.props.removeIngredient}
 						disabled={disabledInfo}
-						purchasable={this.state.purchasable}
+						purchasable={this.updatePurchaseState()} // We call it directly. We need the result.
 						ordered={this.purchaseHandler}
 						/>
 					</div>
@@ -175,4 +115,18 @@ class BurgerBuilder extends React.Component {
 	}
 }
 
-export default ErrorHandler(BurgerBuilder, axios);
+const mapStateToProps = (state) => {
+	return {
+		ingredients: state.ingredients,
+		totalPrice: state.totalPrice
+	}
+}
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		addIngredient: (ingredientName) => dispatch({ type: actionTypes.addIngredient, ingredientName }),
+		removeIngredient: (ingredientName) => dispatch({ type: actionTypes.removeIngredient, ingredientName })
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(BurgerBuilder, axios));
