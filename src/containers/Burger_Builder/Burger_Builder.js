@@ -18,8 +18,8 @@ class BurgerBuilder extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			ingredients: null,
-			totalPrice: 5,
+			ingredients: null, // move to Redux
+			totalPrice: 5, // move to Redux
 			purchasable: false,
 			purchasing: false,
 			loading: false
