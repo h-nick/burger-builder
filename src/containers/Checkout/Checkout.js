@@ -19,8 +19,8 @@ class Checkout extends Component {
 		}
 
 		this.state = {
-			ingredients: ingredients,
-			totalPrice: price
+			ingredients: ingredients, // move to Redux
+			totalPrice: price // move to Redux
 		};
 	}
 
