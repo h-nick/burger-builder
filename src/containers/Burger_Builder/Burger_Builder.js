@@ -1,14 +1,13 @@
 import React from 'react';
 import ErrorHandler from '../../components/HOC/Error_Handler/Error_Handler';
+import axios from '../../utils/axios_orders';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/Build_Controls/Build_Controls';
 import Modal from '../../components/Ui/Modal/Modal';
 import Spinner from '../../components/Ui/Spinner/Spinner';
 import OrderSummary from '../../components/Burger/Order_Summary/Order_Summary';
-import axios from '../../utils/axios_orders';
-
 import { connect } from 'react-redux';
-import * as actionTypes from '../../store/actions';
+import * as actions from '../../store/actions/index.actions';
 
 class BurgerBuilder extends React.Component {
 	constructor(props) {
@@ -19,15 +18,9 @@ class BurgerBuilder extends React.Component {
 		};
 	}
 
-	/*componentDidMount() {
-		axios.get('https://react-burger-udemy-nhd.firebaseio.com/ingredients.json')
-		.then(response => {
-			this.setState({ ingredients: response.data});
-		})
-		.catch(error => {
-			console.log(error);
-		})
-	}*/
+	componentDidMount() {
+		this.props.initIngredients();
+	}
 
 	purchaseHandler = () => {
 		this.setState({
@@ -71,7 +64,7 @@ class BurgerBuilder extends React.Component {
 		}
 
 		let orderSummary = null;
-		let burger = <Spinner/>;
+		let burger = this.props.error ? <p>Ingredients can't be loaded</p> : <Spinner/>;
 		
 		if(this.props.ingredients) {
 			orderSummary = (
@@ -100,10 +93,6 @@ class BurgerBuilder extends React.Component {
 			);
 		}
 
-		if(this.state.loading) {
-			orderSummary = <Spinner/>
-		}
-
 		return(
 			<>
 				<Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
@@ -118,14 +107,16 @@ class BurgerBuilder extends React.Component {
 const mapStateToProps = (state) => {
 	return {
 		ingredients: state.ingredients,
-		totalPrice: state.totalPrice
+		totalPrice: state.totalPrice,
+		error: state.error
 	}
 }
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		addIngredient: (ingredientName) => dispatch({ type: actionTypes.addIngredient, ingredientName }),
-		removeIngredient: (ingredientName) => dispatch({ type: actionTypes.removeIngredient, ingredientName })
+		addIngredient: (ingredientName) => dispatch(actions.addIngredient(ingredientName)),
+		removeIngredient: (ingredientName) => dispatch(actions.removeIngredient(ingredientName)),
+		initIngredients: () => dispatch(actions.initIngredients())
 	}
 }
 
