@@ -7,10 +7,6 @@ export default class OrderSummary extends Component {
 		this.state = {  };
 	}
 
-	componentDidUpdate() {
-		console.log('OrderSummary did update.');
-	}
-
 	render() {
 		// Ingredients is expected as an object, not an array. This transforms it into an array to create
 		// several <li> elements.

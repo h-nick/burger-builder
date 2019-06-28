@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import ContactData from './contactData/ContactData';
-
 import { connect } from 'react-redux';
 
 class Checkout extends Component {
-
 	checkoutContinueHandler = () => {
 		this.props.history.replace('/checkout/contact-data');
 	}
@@ -16,24 +14,36 @@ class Checkout extends Component {
 	}
 
 	render() {
-		console.log(this.state);
-		return(
-			<div>
-				<CheckoutSummary
-				ingredients={this.props.ingredients}
-				checkoutCanceled={this.checkoutCancelHandler}
-				checkoutContinued={this.checkoutContinueHandler}
-				/>
+		// Redirect the user to the root page if the ingredients haven't loaded.
+		/* This happens if the user access ./checkout/ URL directly since the ingredients wouldn't have
+		loaded yet from the server. */
+		let summary = <Redirect to='/'/>
 
-				<Route path={this.props.match.path + '/contact-data'} component={ContactData}/>
-			</div>
-		)
+		if(this.props.ingredients) {
+			const purchasedRedirect = this.props.purchased ? <Redirect to='/'/> : null;
+
+			summary = (
+				<>
+					{purchasedRedirect}
+					<CheckoutSummary
+					ingredients={this.props.ingredients}
+					checkoutCanceled={this.checkoutCancelHandler}
+					checkoutContinued={this.checkoutContinueHandler}
+					/>
+
+					<Route path={this.props.match.path + '/contact-data'} component={ContactData}/>
+				</>
+			);
+		}
+
+		return summary;
 	}
 }
 
 const mapStateToProps = (state) => {
 	return {
-		ingredients: state.ingredients
+		ingredients: state.burgerBuilder.ingredients,
+		purchased: state.orders.purchased
 	}
 }
 

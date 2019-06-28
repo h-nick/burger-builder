@@ -4,13 +4,20 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter } from 'react-router-dom';
-
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
-import reducer from './store/reducers/burgerBuilder.reducer';
+import burgerBuilder from './store/reducers/burgerBuilder.reducer';
+import orders from './store/reducers/orders.reducer';
+import auth from './store/reducers/auth.reducer';
 import thunk from 'redux-thunk';
 
-const store = createStore(reducer, applyMiddleware(thunk));
+const rootReducer = combineReducers({
+	burgerBuilder,
+	orders,
+	auth
+});
+
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 ReactDOM.render(
 	<Provider store={store}>
