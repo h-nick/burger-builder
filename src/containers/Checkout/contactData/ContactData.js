@@ -5,14 +5,9 @@ import axios from '../../../utils/axios_orders';
 import Spinner from '../../../components/Ui/Spinner/Spinner';
 import Input from '../../../components/Ui/Input/Input';
 import { withRouter } from 'react-router-dom';
-<<<<<<< HEAD
 import { connect } from 'react-redux';
 import ErrorHandler from '../../../components/HOC/Error_Handler/Error_Handler';
 import * as actions from '../../../store/actions/index.actions';
-=======
-
-import { connect } from 'react-redux';
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 
 class ContactData extends Component {
 	helper = (element, type, placeholder, extraRules) => {
@@ -54,10 +49,6 @@ class ContactData extends Component {
 				valid: true
 			}
 		},
-<<<<<<< HEAD
-=======
-		loading: false,
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 		validForm: false
 	}
 
@@ -88,11 +79,6 @@ class ContactData extends Component {
 	orderHandler = (event) => {
 		event.preventDefault();
 
-<<<<<<< HEAD
-=======
-		this.setState({ loading: true });
-
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 		// Thanks to two-way binding, all our form data is already in the state. We simply have to map
 		// keys to values.
 		const formData = {};
@@ -107,20 +93,7 @@ class ContactData extends Component {
 			orderData: formData
 		};
 
-<<<<<<< HEAD
 		this.props.purchaseBurger(order, this.props.token);
-=======
-		axios.post('/orders.json', order) // Done like this as especified by Firebase. Check Lecture #208.
-		.then(response => {
-			this.setState({ loading: false });
-
-			this.props.history.push('/');
-		})
-		.catch(error => {
-			console.log(error);
-			this.setState({ loading: false });
-		});
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 	}
 
 	inputChangedHandler = (event, inputID) => {
@@ -178,12 +151,8 @@ class ContactData extends Component {
 				</Button>
 			</form>
 		)
-<<<<<<< HEAD
 		
 		if(this.props.loading) form = <Spinner/>
-=======
-		if(this.state.loading) form = <Spinner/>
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 
 		return (
 			<div className={Classes.ContactData}>
@@ -196,7 +165,6 @@ class ContactData extends Component {
 
 const mapStateToProps = (state) => {
 	return {
-<<<<<<< HEAD
 		ingredients: state.burgerBuilder.ingredients,
 		totalPrice: state.burgerBuilder.totalPrice,
 		loading: state.orders.loading,
@@ -211,11 +179,3 @@ const mapDispatchToProps = dispatch => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ErrorHandler(ContactData, axios)));
-=======
-		ingredients: state.ingredients,
-		totalPrice: state.totalPrice
-	}
-}
-
-export default connect(mapStateToProps)(withRouter(ContactData));
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27

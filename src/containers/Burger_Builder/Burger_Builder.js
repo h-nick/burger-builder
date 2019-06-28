@@ -50,10 +50,7 @@ class BurgerBuilder extends React.Component {
 	}
 
 	purchaseContinueHandler = () => {
-<<<<<<< HEAD
 		this.props.purchaseInit();
-=======
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 		this.props.history.push('/checkout');
 	}
 
@@ -110,15 +107,9 @@ class BurgerBuilder extends React.Component {
 
 const mapStateToProps = (state) => {
 	return {
-<<<<<<< HEAD
 		ingredients: state.burgerBuilder.ingredients,
 		totalPrice: state.burgerBuilder.totalPrice,
 		error: state.burgerBuilder.error
-=======
-		ingredients: state.ingredients,
-		totalPrice: state.totalPrice,
-		error: state.error
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 	}
 }
 
@@ -126,12 +117,8 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		addIngredient: (ingredientName) => dispatch(actions.addIngredient(ingredientName)),
 		removeIngredient: (ingredientName) => dispatch(actions.removeIngredient(ingredientName)),
-<<<<<<< HEAD
 		initIngredients: () => dispatch(actions.initIngredients()),
 		purchaseInit: () => dispatch(actions.purchaseInit())
-=======
-		initIngredients: () => dispatch(actions.initIngredients())
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 	}
 }
 

@@ -4,7 +4,6 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter } from 'react-router-dom';
-<<<<<<< HEAD
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import burgerBuilder from './store/reducers/burgerBuilder.reducer';
@@ -19,15 +18,6 @@ const rootReducer = combineReducers({
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
-=======
-
-import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
-import reducer from './store/reducers/burgerBuilder.reducer';
-import thunk from 'redux-thunk';
-
-const store = createStore(reducer, applyMiddleware(thunk));
->>>>>>> 94affa979360d2e0e2a8d72a8e4e45c746594b27
 
 ReactDOM.render(
 	<Provider store={store}>
