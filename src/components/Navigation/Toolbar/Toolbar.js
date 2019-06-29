@@ -10,7 +10,7 @@ const Toolbar = (props) => {
 			<DrawerToggle click={props.toggleSideDrawer}/>
 			<div className={Classes.Logo}><Logo/></div>
 			<nav className={Classes.DesktopOnly}>
-				<NavigationItems/>
+				<NavigationItems isAuth={props.isAuth}/>
 			</nav>
 		</header>
 	);

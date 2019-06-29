@@ -1,6 +1,13 @@
 import * as actionTypes from './types.actions';
 import axios from 'axios';
 
+export const setAuthRedirectPath = path => {
+	return {
+		type: actionTypes.setAuthRedirectPath,
+		path
+	}
+}
+
 const authFailed = (error) => {
 	return {
 		type: actionTypes.authFailed,
@@ -21,7 +28,7 @@ const authSuccess = (data) => {
 	}
 }
 
-const authLogOut = () => {
+export const authLogOut = () => {
 	console.log('LOGOUT ACTION');
 	return {
 		type: actionTypes.authLogOut
