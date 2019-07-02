@@ -29,7 +29,10 @@ const authSuccess = (data) => {
 }
 
 export const authLogOut = () => {
-	console.log('LOGOUT ACTION');
+	localStorage.removeItem('token');
+	localStorage.removeItem('expirationDate');
+	localStorage.removeItem('userID');
+
 	return {
 		type: actionTypes.authLogOut
 	}
@@ -40,6 +43,23 @@ export const checkAuthTimeout = expTime => {
 		setTimeout(() => {
 			dispatch(authLogOut());
 		}, expTime * 1000)
+	}
+}
+
+export const authCheckState = () => {
+	return dispatch => {
+		const token = localStorage.getItem('token');
+		const expirationDate = new Date(localStorage.getItem('expirationDate'));
+		const userID = localStorage.getItem('userID');
+
+		if(!token) dispatch(authLogOut());
+		else {
+			if(expirationDate > new Date()) {
+				dispatch(authSuccess({idToken: token, userID}));
+				dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
+			}
+			else dispatch(authLogOut());
+		}
 	}
 }
 
@@ -65,7 +85,11 @@ export const auth = (email, password, isSignUp) => {
 			returnSecureToken: true
 		})
 		.then(response => {
-			console.log('[FIREBASE RESPONSE]', response);
+			const expirationTime = new Date().getTime() + (response.data.expiresIn * 1000);
+
+			localStorage.setItem('token', response.data.idToken);
+			localStorage.setItem('expirationDate', new Date(expirationTime));
+			localStorage.setItem('userID', response.data.localId);
 
 			dispatch(authSuccess({
 				idToken: response.data.idToken,
@@ -75,8 +99,6 @@ export const auth = (email, password, isSignUp) => {
 			dispatch(checkAuthTimeout(response.data.expiresIn));
 		})
 		.catch(err => {
-			console.log('[FIREBASE ERROR]', err);
-
 			dispatch(authFailed(err.response.data.error));
 		});
 	}

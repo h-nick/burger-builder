@@ -90,7 +90,8 @@ class ContactData extends Component {
 			ingredients: this.props.ingredients,
 			// On production this should be calculated on the server-side to avoid tampering.
 			price: this.props.totalPrice,
-			orderData: formData
+			orderData: formData,
+			userID: this.props.userID
 		};
 
 		this.props.purchaseBurger(order, this.props.token);
@@ -168,7 +169,8 @@ const mapStateToProps = (state) => {
 		ingredients: state.burgerBuilder.ingredients,
 		totalPrice: state.burgerBuilder.totalPrice,
 		loading: state.orders.loading,
-		token: state.auth.token
+		token: state.auth.token,
+		userID: state.auth.id
 	}
 }
 
