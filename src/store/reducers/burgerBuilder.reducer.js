@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/types.actions';
-import { updateObject } from '../utils/updateObject';
+import updateObject from '../../utils/updateObject';
 
 const basePrice = 5;
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Button from '../../../components/Ui/Button/Button';
+import updateObject from '../../../utils/updateObject';
 import Classes from './ContactData.css';
 import axios from '../../../utils/axios_orders';
 import Spinner from '../../../components/Ui/Spinner/Spinner';
@@ -8,6 +9,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import ErrorHandler from '../../../components/HOC/Error_Handler/Error_Handler';
 import * as actions from '../../../store/actions/index.actions';
+import checkValidation from '../../../utils/checkValidation';
 
 class ContactData extends Component {
 	helper = (element, type, placeholder, extraRules) => {
@@ -52,30 +54,6 @@ class ContactData extends Component {
 		validForm: false
 	}
 
-	checkValidation = (value, rules) => {
-		// Each rule is checked against && isValid to avoid having the last rule change the isValid value to true
-		// if another rule check changes it to false.
-
-		let isValid = true;
-
-		if(!rules) return true;
-
-		if(rules.required) {
-			// False if the trimmed value equals to an empty string.
-			isValid = value.trim() !== '' && isValid;
-		}
-
-		if(rules.minLength) {
-			isValid = value.length >= rules.minLength && isValid;
-		}
-
-		if(rules.maxLength) {
-			isValid = value.length <= rules.maxLength && isValid;
-		}
-
-		return isValid;
-	}
-
 	orderHandler = (event) => {
 		event.preventDefault();
 
@@ -98,19 +76,18 @@ class ContactData extends Component {
 	}
 
 	inputChangedHandler = (event, inputID) => {
-		/* updatedInput copies orderForm which has nested elements. This is not a deep copy and violates React
-		state immutability. */
-		const updatedOrderForm = { ...this.state.orderForm }
+		const updatedFormElement = updateObject(this.state.orderForm[inputID], {
+			value: event.target.value,
+			valid: checkValidation(
+				event.target.value,
+				this.state.orderForm[inputID].validation
+			),
+			touched: true
+		});
 
-		/* By doing this we copy an specific object from our state. It still has nested elements and therefore
-		violates state immutability. However, since we only care about the "value" property which isn't nested,
-		there's no mutation of the state as long as we don't touch the "elementConfig" property. */
-		const updatedFormElement = { ...updatedOrderForm[inputID] }
-
-		updatedFormElement.value = event.target.value;
-		updatedFormElement.valid = this.checkValidation(updatedFormElement.value, updatedFormElement.validation);
-		updatedFormElement.touched = true;
-		updatedOrderForm[inputID] = updatedFormElement;
+		const updatedOrderForm = updateObject(this.state.orderForm, {
+			[inputID]: updatedFormElement
+		});
 
 		let formIsValid = true;
 		for(let key in updatedOrderForm) {
