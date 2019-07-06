@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import Layout from './containers/Layout/Layout';
-import BurgerBuilder from './containers/Burger_Builder/Burger_Builder';
-import Checkout from './containers/Checkout/Checkout';
-import Orders from './containers/Orders/Orders';
-import Auth from './containers/Auth/Auth';
-import LogOut from './containers/Auth/LogOut/LogOut';
+import asyncComponent from '../src/components/HOC/Async_Component/Async_Component';
 import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index.actions';
+const AsyncBurgerBuilder = asyncComponent(() => import('./containers/Burger_Builder/Burger_Builder'));
+const AsyncCheckout = asyncComponent(() => import('./containers/Checkout/Checkout'));
+const AsyncOrders = asyncComponent(() => import('./containers/Orders/Orders'));
+const AsyncAuth = asyncComponent(() => import('./containers/Auth/Auth'));
+const AsyncLogOut = asyncComponent(() => import('./containers/Auth/LogOut/LogOut'));
 
 class App extends Component {
 	componentDidMount() {
@@ -17,19 +18,19 @@ class App extends Component {
 	render() {
 		let routes = (
 			<Switch>
-				<Route path='/auth' component={Auth}/>
-				<Route path="/" exact component={BurgerBuilder}/>
+				<Route path='/auth' component={AsyncAuth}/>
+				<Route path="/" exact component={AsyncBurgerBuilder}/>
 				<Redirect to='/'/>
 			</Switch>
 		);
 
 		if(this.props.isAuth) routes = (
 			<Switch>
-				<Route path='/auth' component={Auth}/> {/* Kept for redirection inside Auth component. */}
-				<Route path='/orders' component={Orders}/>
-				<Route path="/checkout" component={Checkout}/>
-				<Route path='/logout' component={LogOut}/>
-				<Route path='/' exact component={BurgerBuilder}/>
+				<Route path='/auth' component={AsyncAuth}/> {/* Kept for redirection inside Auth component. */}
+				<Route path='/orders' component={AsyncOrders}/>
+				<Route path="/checkout" component={AsyncCheckout}/>
+				<Route path='/logout' component={AsyncLogOut}/>
+				<Route path='/' exact component={AsyncBurgerBuilder}/>
 				<Redirect to='/'/>
 			</Switch>
 		);
