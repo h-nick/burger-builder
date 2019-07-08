@@ -1,5 +1,5 @@
 import React from 'react';
-import NavigationLinks from './Navigation_Link/Navigation_Link';
+import NavigationLink from './Navigation_Link/Navigation_Link';
 import Classes from './Navigation_Items.css';
 
 const navigationItems = (props) => {
@@ -7,14 +7,14 @@ const navigationItems = (props) => {
 	let ordersLink = null;
 
 	if(props.isAuth) {
-		authLink = <NavigationLinks link='/logout'>Log Out</NavigationLinks>;
-		ordersLink = <NavigationLinks link='/orders'>Orders</NavigationLinks>;
+		authLink = <NavigationLink link='/logout'>Log Out</NavigationLink>;
+		ordersLink = <NavigationLink link='/orders'>Orders</NavigationLink>;
 	} else {
-		authLink = <NavigationLinks link='/auth'>Authenticate</NavigationLinks>;
+		authLink = <NavigationLink link='/auth'>Authenticate</NavigationLink>;
 	}
 
 	return(<ul className={Classes.NavigationItems}>
-		<NavigationLinks link='/'>Burger Builder</NavigationLinks>
+		<NavigationLink link='/'>Burger Builder</NavigationLink>
 		{ordersLink}
 		{authLink}
 	</ul>);
