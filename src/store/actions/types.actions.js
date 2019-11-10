@@ -16,5 +16,6 @@ export const authStart = 'authStart';
 export const authSuccess = 'authSuccess';
 export const authFailed = 'authFailed';
 export const authLogOut = 'authLogOut';
+export const authInitiateLogout = 'authInitiateLogout';
 
 export const setAuthRedirectPath = 'setAuthRedirectPath';

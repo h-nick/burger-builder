@@ -29,12 +29,8 @@ const authSuccess = (data) => {
 }
 
 export const authLogOut = () => {
-	localStorage.removeItem('token');
-	localStorage.removeItem('expirationDate');
-	localStorage.removeItem('userID');
-
 	return {
-		type: actionTypes.authLogOut
+		type: actionTypes.authInitiateLogout
 	}
 }
 
@@ -52,10 +48,10 @@ export const authCheckState = () => {
 		const expirationDate = new Date(localStorage.getItem('expirationDate'));
 		const userID = localStorage.getItem('userID');
 
-		if(!token) dispatch(authLogOut());
+		if (!token) dispatch(authLogOut());
 		else {
-			if(expirationDate > new Date()) {
-				dispatch(authSuccess({idToken: token, userID}));
+			if (expirationDate > new Date()) {
+				dispatch(authSuccess({ idToken: token, userID }));
 				dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
 			}
 			else dispatch(authLogOut());
@@ -72,7 +68,7 @@ export const auth = (email, password, isSignUp) => {
 			'key=AIzaSyCL3gCzQD-pSZ-8p91Afq3svWrfmV0uuJ4'
 		);
 
-		if(!isSignUp) {
+		if (!isSignUp) {
 			URL = (
 				'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?' +
 				'key=AIzaSyCL3gCzQD-pSZ-8p91Afq3svWrfmV0uuJ4'
@@ -84,22 +80,23 @@ export const auth = (email, password, isSignUp) => {
 			password,
 			returnSecureToken: true
 		})
-		.then(response => {
-			const expirationTime = new Date().getTime() + (response.data.expiresIn * 1000);
+			.then(response => {
+				const expirationTime = new Date().getTime() + (response.data.expiresIn * 1000);
 
-			localStorage.setItem('token', response.data.idToken);
-			localStorage.setItem('expirationDate', new Date(expirationTime));
-			localStorage.setItem('userID', response.data.localId);
+				localStorage.setItem('token', response.data.idToken);
+				localStorage.setItem('expirationDate', new Date(expirationTime));
+				localStorage.setItem('userID', response.data.localId);
 
-			dispatch(authSuccess({
-				idToken: response.data.idToken,
-				userID: response.data.localId}
-			));
+				dispatch(authSuccess({
+					idToken: response.data.idToken,
+					userID: response.data.localId
+				}
+				));
 
-			dispatch(checkAuthTimeout(response.data.expiresIn));
-		})
-		.catch(err => {
-			dispatch(authFailed(err.response.data.error));
-		});
+				dispatch(checkAuthTimeout(response.data.expiresIn));
+			})
+			.catch(err => {
+				dispatch(authFailed(err.response.data.error));
+			});
 	}
 }
