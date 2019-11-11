@@ -2,6 +2,7 @@ export const addIngredient = 'addIngredient';
 export const removeIngredient = 'removeIngredient';
 export const setIngredients = 'setIngredients';
 export const fetchIngredientsFailed = 'fetchIngredientsFailed';
+export const initIngredients = 'initIngredients';
 
 export const purchaseSuccess = 'purchaseSuccess';
 export const purchaseFailed = 'purchaseFailed';
