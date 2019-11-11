@@ -12,10 +12,13 @@ export const fetchOrdersStart = 'fetchOrdersStart';
 export const fetchOrdersSuccess = 'fetchOrdersSuccess';
 export const fetchOrdersFailed = 'fetchOrdersFailed';
 
+export const auth = 'auth';
+export const authCheckState = 'authCheckState';
 export const authStart = 'authStart';
 export const authSuccess = 'authSuccess';
 export const authFailed = 'authFailed';
 export const authLogOut = 'authLogOut';
 export const authInitiateLogout = 'authInitiateLogout';
+export const authCheckTimeout = 'authCheckTimeout';
 
 export const setAuthRedirectPath = 'setAuthRedirectPath';
