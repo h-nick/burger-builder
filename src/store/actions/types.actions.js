@@ -4,11 +4,13 @@ export const setIngredients = 'setIngredients';
 export const fetchIngredientsFailed = 'fetchIngredientsFailed';
 export const initIngredients = 'initIngredients';
 
+export const purchaseBurger = 'purchaseBurger';
 export const purchaseSuccess = 'purchaseSuccess';
 export const purchaseFailed = 'purchaseFailed';
 export const purchaseBurgerStart = 'purchaseBurgerStart';
 export const purchaseInit = 'purchaseInit';
 
+export const fetchOrders = 'fetchOrders';
 export const fetchOrdersStart = 'fetchOrdersStart';
 export const fetchOrdersSuccess = 'fetchOrdersSuccess';
 export const fetchOrdersFailed = 'fetchOrdersFailed';
